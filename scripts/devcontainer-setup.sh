@@ -24,9 +24,21 @@ npm install -g ic-mops
 mops install
 
 # Set up Fetch Uagents
-apt install -y python3-pip
-apt install -y python3-venv
+echo "🐍 Setting up Python environment..."
+apt update && apt install -y python3-pip python3-venv
+
+# Remove existing virtual environment if it exists
+if [ -d ".venv" ]; then
+    echo "Removing existing virtual environment..."
+    rm -rf .venv
+fi
+
+# Create virtual environment
+echo "Creating Python virtual environment..."
 python3 -m venv .venv
+
+# Activate virtual environment and install uagents
+echo "Installing uagents..."
 source .venv/bin/activate
 pip install uagents
 
