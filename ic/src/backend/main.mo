@@ -1,11 +1,15 @@
 import Text "mo:base/Text";
 import Blob "mo:base/Blob";
 import Int "mo:base/Int";
+import Int64 "mo:base/Int64";
 import Nat "mo:base/Nat";
 import Nat16 "mo:base/Nat16";
+import Nat32 "mo:base/Nat32";
+import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Time "mo:base/Time";
+import ExperimentalCycles "mo:base/ExperimentalCycles";
 
 persistent actor {
   // ----- Type definitions -----
@@ -72,20 +76,48 @@ persistent actor {
     };
   };
 
+  // Bitcoin API types
+  type GetBalanceRequest = {
+    address : Text;
+    network : { #mainnet; #testnet; #regtest };
+    min_confirmations : ?Nat32;
+  };
+
+  // Reference to the management canister
+  let management_canister = actor ("aaaaa-aa") : actor {
+    bitcoin_get_balance : shared GetBalanceRequest -> async Nat64;
+  };
+
   // ----- Public API functions (can be called directly or via HTTP) -----
 
   // Welcome message
   public shared query func welcome() : async WelcomeResponse {
     {
-      message = "Welcome to the Dummy Bitcoin Canister API";
+      message = "Welcome to the Bitcoin Canister API";
     };
   };
 
-  // Dummy: Returns the balance of a given Bitcoin address
-  public shared query func get_balance(address : Text) : async BalanceResponse {
+  // Real implementation: queries the Bitcoin balance
+  public shared func get_balance(address : Text) : async BalanceResponse {
+    // Set the network (choose #testnet or #mainnet as needed)
+    let network = #regtest;
+
+    // Prepare the request
+    let request : GetBalanceRequest = {
+      address = address;
+      network = network;
+      min_confirmations = null;
+    };
+
+    // Call the management canister's bitcoin_get_balance endpoint with cycles
+    let satoshis = await (with cycles = 100_000_000) management_canister.bitcoin_get_balance(request);
+
+    // Convert satoshis to BTC (1 BTC = 100,000,000 satoshis)
+    let btcBalance = Float.fromInt64(Int64.fromNat64(satoshis)) / 100_000_000.0;
+
     {
       address = address;
-      balance = 0.005;
+      balance = btcBalance;
       unit = "BTC";
     };
   };

@@ -6,9 +6,7 @@
     "ic"
   ],
   "scripts": {
-    "pretest": "npm run pretest --workspace=ic",
-    "test": "npm run test --workspace=ic",
-    "format": "npm run format --workspace=ic"
+    "format": "npm run format"
   },
   "keywords": [],
   "author": "",

@@ -8,8 +8,7 @@ git config --global --add safe.directory /workspaces/fetch-icp-motoko
 
 # Install npm dependencies
 echo "📦 Installing npm dependencies..."
-cd ic && npm install
-cd ..
+npm install
 
 # Update dfx to latest
 echo "🔄 Updating dfx..."
@@ -25,7 +24,8 @@ dfx stop
 # Install mops dependencies
 echo "📦 Installing mops dependencies..."
 npm install -g ic-mops
-mops install
+cd ic && mops install
+cd ..
 
 # Set up Fetch Uagents
 echo "🐍 Setting up Python environment..."
