@@ -4,11 +4,7 @@ set -e
 echo "🚀 Setting up devcontainer..."
 
 # Fix for git dubious ownership issue in Codespaces
-git config --global --add safe.directory /workspaces/fetch-icp-integration
-
-# Install Azle CLI
-echo "🔗 Installing Azle CLI..."
-npm install -g azle@latest
+git config --global --add safe.directory /workspaces/fetch-icp-motoko
 
 # Install npm dependencies
 echo "📦 Installing npm dependencies..."
@@ -22,8 +18,10 @@ dfx identity use codespace_dev
 dfx start --background             
 dfx stop
 
-# Fix missing pkill on dfx build
-apt-get install -y procps
+# Install mops dependencies
+echo "📦 Installing mops dependencies..."
+npm install -g ic-mops
+mops install
 
 # Set up Fetch Uagents
 apt install -y python3-pip
