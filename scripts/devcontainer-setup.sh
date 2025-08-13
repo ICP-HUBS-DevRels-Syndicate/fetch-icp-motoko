@@ -11,6 +11,10 @@ echo "📦 Installing npm dependencies..."
 cd ic && npm install
 cd ..
 
+# Update dfx to latest
+echo "🔄 Updating dfx..."
+dfxvm update
+
 # Set up dfx identity for codespace
 echo "🔑 Setting up dfx identity..."
 dfx identity new codespace_dev --storage-mode=plaintext || echo "Identity may already exist"
