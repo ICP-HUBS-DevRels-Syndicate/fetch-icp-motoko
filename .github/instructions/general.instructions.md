@@ -6,14 +6,13 @@ applyTo: "**"
 
 ## Project Context
 
-- This is an Internet Computer Protocol (ICP) project using Typescript for canister development with Azle Development Kit.
-- The backend is tested with Jest.
+- This is an Internet Computer Protocol (ICP) project using Motoko for canister development.
 - There isn't a frontend, since this is a Web API project.
 
 ## Code Quality & Formatting
 
-- We use `prettier` for formatting and linting **TypeScript** code.
-- Run `npm run format` for formatting typescript.
+- We use `prettier` for formatting and linting **Motoko** code.
+- Run `npm run format` for formatting motoko.
 
 ## AI Assistance
 

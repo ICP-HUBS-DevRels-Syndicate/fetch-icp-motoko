@@ -1,7 +1,7 @@
 {
   "name": "Fetch IC Dev Environment",
-  "image": "ghcr.io/dfinity/icp-dev-env-azle:latest",
-  "forwardPorts": [4943, 5173, 11434],
+  "image": "ghcr.io/dfinity/icp-dev-env:latest",
+  "forwardPorts": [4943],
   "portsAttributes": {
     "4943": {
       "label": "dfx",
@@ -15,7 +15,10 @@
       "extensions": [
         "GitHub.copilot",
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "tamasfe.even-better-toml",
+        "dfinity-foundation.vscode-motoko",
+        "motoko-lsp-client.motoko-lsp-client"
       ],
       "settings": {
         "chat.promptFiles": true,
@@ -26,22 +29,23 @@
             "file": "general.instructions.md"
           },
           {
-            "file": "python.instructions.md"
+            "file": "motoko.instructions.md"
           },
           {
             "file": "typescript.instructions.md"
           }
-        ],
-        "github.copilot.chat.testGeneration.instructions": [
-          {
-            "file": "test.instructions.md"
-          }
-        ],
+        ],        
         "settingsSync.ignoredExtensions": ["*"],
         "settingsSync.ignoredSettings": [
-          "github.copilot.chat.codeGeneration.instructions",
-          "github.copilot.chat.testGeneration.instructions"
+          "github.copilot.chat.codeGeneration.instructions"          
         ]
+      },
+      "codespaces": {
+        "repositories": {
+          "*": {
+            "installRecommendedExtensions": false
+          }
+        }
       }
     }
   },
