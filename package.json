@@ -1,0 +1,16 @@
+{
+  "name": "fetch-icp-azle",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+    "ic"
+  ],
+  "scripts": {
+    "pretest": "npm run pretest --workspace=ic",
+    "test": "npm run test --workspace=ic",
+    "format": "npm run format --workspace=ic"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
