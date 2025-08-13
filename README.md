@@ -48,10 +48,10 @@ To set up and run the ICP canister locally, follow these steps:
 1. **Click "Use Template" and create your own repository**
 
 2. **Open project as a VS Code Codespace**
-3. **Start up a local ICP replica:**
+3. **Start up a local ICP replica with BTC Node:**
 
    ```bash
-   dfx start
+   dfx start --clean --enable-bitcoin --bitcoin-node 127.0.0.1:18444
    ```
 
 4. **In a separate terminal, deploy your canister:**
@@ -136,6 +136,7 @@ INFO: [test-ICP-agent]: Agent inspector available at https://agentverse.ai/inspe
 ![Mailbox done](./fetch/images/mailbox-done.png)
 
 4. Test the agent using the Chat interface with queries like:
+
    - Once connected, click on Agent Profile
      ![Agent Profile](./fetch/images/agent-profile.png)
 
