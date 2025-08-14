@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "agent": "./fetch/venv/bin/python fetch/agent.py"
   },
   "keywords": [],
   "author": "",

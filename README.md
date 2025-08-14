@@ -118,7 +118,14 @@ To use the agent, you need an ASI:One API Key. Follow these steps:
 1. In a separate terminal, start the agent:
 
 ```bash
-python3 agent.py
+cd fetch
+./venv/bin/python agents.py
+```
+
+or through npm
+
+```bash
+npm run agent
 ```
 
 2. The agent will start and display its address and inspector URL:
