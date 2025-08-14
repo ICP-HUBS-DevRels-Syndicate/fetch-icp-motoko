@@ -4,85 +4,14 @@ import Int "mo:base/Int";
 import Int64 "mo:base/Int64";
 import Nat "mo:base/Nat";
 import Nat16 "mo:base/Nat16";
-import Nat32 "mo:base/Nat32";
 import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Time "mo:base/Time";
 import { JSON } "mo:serde";
+import Types "./Types";
 
 persistent actor {
-  // ----- Type definitions -----
-  type HeaderField = (Text, Text);
-
-  type HttpRequest = {
-    method : Text;
-    url : Text;
-    headers : [HeaderField];
-    body : Blob;
-    certificate_version : ?Nat16;
-  };
-
-  type HttpResponse = {
-    status_code : Nat16;
-    headers : [HeaderField];
-    body : Blob;
-    streaming_strategy : ?Null;
-    upgrade : ?Bool;
-  };
-
-  // API response types
-  type WelcomeResponse = {
-    message : Text;
-  };
-
-  type BalanceResponse = {
-    address : Text;
-    balance : Float;
-    unit : Text;
-  };
-
-  type UtxoResponse = {
-    txid : Text;
-    vout : Nat;
-    value : Nat;
-    confirmations : Nat;
-  };
-
-  type AddressResponse = {
-    address : Text;
-  };
-
-  type SendResponse = {
-    success : Bool;
-    destination : Text;
-    amount : Nat;
-    txId : Text;
-  };
-
-  type TestDataResponse = {
-    id : Nat;
-    name : Text;
-    value : Float;
-    isTest : Bool;
-  };
-
-  type DummyTestResponse = {
-    status : Text;
-    data : {
-      message : Text;
-      timestamp : Text;
-      testData : TestDataResponse;
-    };
-  };
-
-  // Bitcoin API types
-  type GetBalanceRequest = {
-    address : Text;
-    network : { #mainnet; #testnet; #regtest };
-    min_confirmations : ?Nat32;
-  };
-
   // Record keys for JSON serialization
   let WelcomeResponseKeys = ["message"];
   let BalanceResponseKeys = ["address", "balance", "unit"];
@@ -93,25 +22,25 @@ persistent actor {
 
   // Reference to the management canister
   let management_canister = actor ("aaaaa-aa") : actor {
-    bitcoin_get_balance : shared GetBalanceRequest -> async Nat64;
+    bitcoin_get_balance : shared Types.GetBalanceRequest -> async Nat64;
   };
 
   // ----- Public API functions (can be called directly or via HTTP) -----
 
   // Welcome message
-  public shared query func welcome() : async WelcomeResponse {
+  public shared query func welcome() : async Types.WelcomeResponse {
     {
       message = "Welcome to the Bitcoin Canister API";
     };
   };
 
   // Real implementation: queries the Bitcoin balance
-  public shared func get_balance(address : Text) : async BalanceResponse {
+  public shared func get_balance(address : Text) : async Types.BalanceResponse {
     // Set the network (choose #testnet or #mainnet as needed)
     let network = #regtest;
 
     // Prepare the request
-    let request : GetBalanceRequest = {
+    let request : Types.GetBalanceRequest = {
       address = address;
       network = network;
       min_confirmations = null;
@@ -131,7 +60,7 @@ persistent actor {
   };
 
   // Dummy: Returns the UTXOs of a given Bitcoin address
-  public shared query func get_utxos(_address : Text) : async [UtxoResponse] {
+  public shared query func get_utxos(_address : Text) : async [Types.UtxoResponse] {
     [
       {
         txid = "dummy-txid-1";
@@ -154,14 +83,14 @@ persistent actor {
   };
 
   // Dummy: Returns the P2PKH address of this canister
-  public shared query func get_p2pkh_address() : async AddressResponse {
+  public shared query func get_p2pkh_address() : async Types.AddressResponse {
     {
       address = "tb1qdummyaddressxyz1234567890";
     };
   };
 
   // Dummy: Sends satoshis from this canister to a specified address
-  public shared func send(destinationAddress : Text, amountInSatoshi : Nat) : async SendResponse {
+  public shared func send(destinationAddress : Text, amountInSatoshi : Nat) : async Types.SendResponse {
     {
       success = true;
       destination = destinationAddress;
@@ -171,7 +100,7 @@ persistent actor {
   };
 
   // Dummy test endpoint
-  public shared query func dummy_test() : async DummyTestResponse {
+  public shared query func dummy_test() : async Types.DummyTestResponse {
     let now = Time.now();
     let timestamp = "2024-" # Int.toText(now / 1000000000) # "T00:00:00.000Z";
 
@@ -203,7 +132,7 @@ persistent actor {
   };
 
   // Constructs a JSON HTTP response using serde
-  private func makeJsonResponse(statusCode : Nat16, jsonText : Text) : HttpResponse {
+  private func makeJsonResponse(statusCode : Nat16, jsonText : Text) : Types.HttpResponse {
     {
       status_code = statusCode;
       headers = [("content-type", "application/json"), ("access-control-allow-origin", "*")];
@@ -214,7 +143,7 @@ persistent actor {
   };
 
   // Constructs a standardized error response for serialization failures
-  private func makeSerializationErrorResponse() : HttpResponse {
+  private func makeSerializationErrorResponse() : Types.HttpResponse {
     {
       status_code = 500;
       headers = [("content-type", "application/json")];
@@ -225,7 +154,7 @@ persistent actor {
   };
 
   // Handles simple HTTP routes (GET/OPTIONS and fallback)
-  private func handleRoute(method : Text, url : Text, _body : Blob) : HttpResponse {
+  private func handleRoute(method : Text, url : Text, _body : Blob) : Types.HttpResponse {
     let normalizedUrl = Text.trimEnd(url, #text "/");
 
     switch (method, normalizedUrl) {
@@ -268,7 +197,7 @@ persistent actor {
   };
 
   // Handles POST routes that require async update (e.g., calling other functions)
-  private func handleRouteUpdate(method : Text, url : Text, body : Blob) : async HttpResponse {
+  private func handleRouteUpdate(method : Text, url : Text, body : Blob) : async Types.HttpResponse {
     let normalizedUrl = Text.trimEnd(url, #text "/");
 
     switch (method, normalizedUrl) {
@@ -327,12 +256,12 @@ persistent actor {
   };
 
   // HTTP query interface for GET/OPTIONS and static responses
-  public query func http_request(req : HttpRequest) : async HttpResponse {
+  public query func http_request(req : Types.HttpRequest) : async Types.HttpResponse {
     return handleRoute(req.method, req.url, req.body);
   };
 
   // HTTP update interface for POST routes requiring async calls
-  public func http_request_update(req : HttpRequest) : async HttpResponse {
+  public func http_request_update(req : Types.HttpRequest) : async Types.HttpResponse {
     return await handleRouteUpdate(req.method, req.url, req.body);
   };
 };
