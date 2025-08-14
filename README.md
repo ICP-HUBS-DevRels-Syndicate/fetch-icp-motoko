@@ -155,20 +155,15 @@ The agent supports various types of queries:
 
 ### Balance Queries
 
-- What's the balance of address tb1qexample1234567890?
-- Can you check how many bitcoins are in tb1qabcde000001234567?
+- What's the balance of address bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?
+- Can you check how many bitcoins are in bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?
 
 ### UTXO Queries
 
-- What UTXOs are available for address tb1qexampleutxo0001?
-- List unspent outputs for tb1qunspentoutputs111
+- What UTXOs are available for address bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?
+- List unspent outputs for bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs
 
 ### Fee Queries
 
 - What are the current Bitcoin fee percentiles?
 - Show me the latest fee percentile distribution
-
-### Transaction Queries
-
-- Send 10,000 satoshis to tb1qreceiver000111
-- Transfer 50000 sats to tb1qsimplewalletabc
