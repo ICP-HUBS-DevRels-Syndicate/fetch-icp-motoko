@@ -21,28 +21,13 @@
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "tamasfe.even-better-toml",
-        "dfinity-foundation.vscode-motoko",
-        "motoko-lsp-client.motoko-lsp-client"
+        "dfinity-foundation.vscode-motoko"
       ],
       "settings": {
         "chat.promptFiles": true,
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "github.copilot.chat.codeGeneration.instructions": [
-          {
-            "file": "general.instructions.md"
-          },
-          {
-            "file": "motoko.instructions.md"
-          },
-          {
-            "file": "typescript.instructions.md"
-          }
-        ],
-        "settingsSync.ignoredExtensions": ["*"],
-        "settingsSync.ignoredSettings": [
-          "github.copilot.chat.codeGeneration.instructions"
-        ]
+        "settingsSync.ignoredExtensions": ["*"]
       },
       "codespaces": {
         "repositories": {
