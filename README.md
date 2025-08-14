@@ -29,15 +29,9 @@ The ICP component (`ic/src/backend/index.ts`) implements a dummy HTTP server wit
 Note: This is a dummy implementation that returns mock data. The actual implementation needs to be amended.
 
 You can call from the command line:
-Local:
 
-- curl http://[canisterId].raw.localhost:4943/
-- curl -X POST -H "Content-Type: application/json" -d "{ \"address\": \"[BTC Address]\" }" http://[canisterId].raw.localhost:4943/get-balance (it only works on Mainnet)
-
-IC:
-
-- curl https://[canisterId].icp0.io/
-- curl -X POST -H "Content-Type: application/json" -d "{ \"address\": \"[BTC Address]\" }" https://[canisterId].icp0.io/get-balance
+- curl http://[canisterId].localhost:4943/
+- curl -X POST -H "Content-Type: application/json" -d "{ \"address\": \"[BTC Address]\" }" http://[canisterId].localhost:4943/get-balance
 
 ---
 
@@ -62,7 +56,7 @@ To set up and run the ICP canister locally, follow these steps:
    ```
 
 5. **In the browser, open and interact with HTTP Server:**
-   - URL: http://{canister backend id}.raw.localhost:4943/ (see id from deploy message)
+   - URL: http://{canister backend id}.localhost:4943/ (see id from deploy message)
 
 ---
 
@@ -119,7 +113,7 @@ To use the agent, you need an ASI:One API Key. Follow these steps:
 
 ```bash
 cd fetch
-./venv/bin/python agents.py
+./venv/bin/python agent.py
 ```
 
 or through npm
