@@ -126,9 +126,18 @@ persistent actor {
     ("extracted-destination", 50000);
   };
 
-  // Extracts address from HTTP request body (simplified demo)
-  private func extractAddress(_body : Blob) : Text {
-    "extracted-address";
+  // Extracts address from HTTP request body
+  private func extractAddress(body : Blob) : Text {
+    // Parse JSON and extract address field
+    type AddressBody = {
+      address : Text;
+    };
+
+    let addressBody : ?AddressBody = from_candid (body);
+    switch (addressBody) {
+      case null "missing-address"; // Return fallback
+      case (?b) { b.address };
+    };
   };
 
   // Constructs a JSON HTTP response using serde
