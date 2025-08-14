@@ -9,7 +9,7 @@ import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Time "mo:base/Time";
-import ExperimentalCycles "mo:base/ExperimentalCycles";
+import { JSON } "mo:serde";
 
 persistent actor {
   // ----- Type definitions -----
@@ -82,6 +82,14 @@ persistent actor {
     network : { #mainnet; #testnet; #regtest };
     min_confirmations : ?Nat32;
   };
+
+  // Record keys for JSON serialization
+  let WelcomeResponseKeys = ["message"];
+  let BalanceResponseKeys = ["address", "balance", "unit"];
+  let UtxoResponseKeys = ["txid", "vout", "value", "confirmations"];
+  let AddressResponseKeys = ["address"];
+  let SendResponseKeys = ["success", "destination", "amount", "txId"];
+  let DummyTestResponseKeys = ["status", "data", "message", "timestamp", "testData", "id", "name", "value", "isTest"];
 
   // Reference to the management canister
   let management_canister = actor ("aaaaa-aa") : actor {
@@ -194,12 +202,12 @@ persistent actor {
     "extracted-address";
   };
 
-  // Constructs a JSON HTTP response
-  private func makeJsonResponse(statusCode : Nat16, jsonContent : Text) : HttpResponse {
+  // Constructs a JSON HTTP response using serde
+  private func makeJsonResponse(statusCode : Nat16, jsonText : Text) : HttpResponse {
     {
       status_code = statusCode;
       headers = [("content-type", "application/json"), ("access-control-allow-origin", "*")];
-      body = Text.encodeUtf8(jsonContent);
+      body = Text.encodeUtf8(jsonText);
       streaming_strategy = null;
       upgrade = ?true;
     };
@@ -211,7 +219,18 @@ persistent actor {
 
     switch (method, normalizedUrl) {
       case ("GET", "" or "/") {
-        makeJsonResponse(200, "{\"message\": \"Welcome to the Dummy Bitcoin Canister API\"}");
+        let welcomeMsg = {
+          message = "Welcome to the Dummy Bitcoin Canister API";
+        };
+        let blob = to_candid (welcomeMsg);
+        let #ok(jsonText) = JSON.toText(blob, WelcomeResponseKeys, null) else return {
+          status_code = 500;
+          headers = [("content-type", "application/json")];
+          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
+          streaming_strategy = null;
+          upgrade = null;
+        };
+        makeJsonResponse(200, jsonText);
       };
       case ("OPTIONS", _) {
         {
@@ -251,36 +270,77 @@ persistent actor {
       case ("POST", "/get-balance") {
         let address = extractAddress(body);
         let response = await get_balance(address);
-        makeJsonResponse(200, "{\"address\": \"" # response.address # "\", \"balance\": " # Float.toText(response.balance) # ", \"unit\": \"" # response.unit # "\"}");
+        let blob = to_candid (response);
+        let #ok(jsonText) = JSON.toText(blob, BalanceResponseKeys, null) else return {
+          status_code = 500;
+          headers = [("content-type", "application/json")];
+          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
+          streaming_strategy = null;
+          upgrade = null;
+        };
+        makeJsonResponse(200, jsonText);
       };
       case ("POST", "/get-utxos") {
         let address = extractAddress(body);
         let utxos = await get_utxos(address);
-        let utxoJsonArray = Array.map<UtxoResponse, Text>(
-          utxos,
-          func(utxo) = "{\"txid\": \"" # utxo.txid # "\", \"vout\": " # Nat.toText(utxo.vout) # ", \"value\": " # Nat.toText(utxo.value) # ", \"confirmations\": " # Nat.toText(utxo.confirmations) # "}",
-        );
-        let jsonUtxos = "[" # Text.join(", ", utxoJsonArray.vals()) # "]";
-        makeJsonResponse(200, jsonUtxos);
+        let blob = to_candid (utxos);
+        let #ok(jsonText) = JSON.toText(blob, UtxoResponseKeys, null) else return {
+          status_code = 500;
+          headers = [("content-type", "application/json")];
+          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
+          streaming_strategy = null;
+          upgrade = null;
+        };
+        makeJsonResponse(200, jsonText);
       };
       case ("POST", "/get-current-fee-percentiles") {
         let percentiles = await get_current_fee_percentiles();
-        let percentileStrings = Array.map<Nat, Text>(percentiles, func(p) = Nat.toText(p));
-        let jsonPercentiles = "[" # Text.join(", ", percentileStrings.vals()) # "]";
-        makeJsonResponse(200, jsonPercentiles);
+        let blob = to_candid (percentiles);
+        let #ok(jsonText) = JSON.toText(blob, [], null) else return {
+          status_code = 500;
+          headers = [("content-type", "application/json")];
+          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
+          streaming_strategy = null;
+          upgrade = null;
+        };
+        makeJsonResponse(200, jsonText);
       };
       case ("POST", "/get-p2pkh-address") {
         let response = await get_p2pkh_address();
-        makeJsonResponse(200, "{\"address\": \"" # response.address # "\"}");
+        let blob = to_candid (response);
+        let #ok(jsonText) = JSON.toText(blob, AddressResponseKeys, null) else return {
+          status_code = 500;
+          headers = [("content-type", "application/json")];
+          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
+          streaming_strategy = null;
+          upgrade = null;
+        };
+        makeJsonResponse(200, jsonText);
       };
       case ("POST", "/send") {
         let (destination, amount) = extractSendParams(body);
         let response = await send(destination, amount);
-        makeJsonResponse(200, "{\"success\": " # "true" # ", \"destination\": \"" # response.destination # "\", \"amount\": " # Nat.toText(response.amount) # ", \"txId\": \"" # response.txId # "\"}");
+        let blob = to_candid (response);
+        let #ok(jsonText) = JSON.toText(blob, SendResponseKeys, null) else return {
+          status_code = 500;
+          headers = [("content-type", "application/json")];
+          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
+          streaming_strategy = null;
+          upgrade = null;
+        };
+        makeJsonResponse(200, jsonText);
       };
       case ("POST", "/dummy-test") {
         let response = await dummy_test();
-        makeJsonResponse(200, "{\"status\": \"" # response.status # "\", \"data\": {\"message\": \"" # response.data.message # "\", \"timestamp\": \"" # response.data.timestamp # "\", \"testData\": {\"id\": " # Nat.toText(response.data.testData.id) # ", \"name\": \"" # response.data.testData.name # "\", \"value\": " # Float.toText(response.data.testData.value) # ", \"isTest\": " # "true" # "}}}");
+        let blob = to_candid (response);
+        let #ok(jsonText) = JSON.toText(blob, DummyTestResponseKeys, null) else return {
+          status_code = 500;
+          headers = [("content-type", "application/json")];
+          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
+          streaming_strategy = null;
+          upgrade = null;
+        };
+        makeJsonResponse(200, jsonText);
       };
       case ("OPTIONS", _) {
         {
