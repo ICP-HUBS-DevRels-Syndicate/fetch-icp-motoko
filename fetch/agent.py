@@ -203,6 +203,7 @@ async def process_query(query: str, ctx: Context) -> str:
 agent = Agent(
     name='test-ICP-agent',
     port=8001,
+    endpoint=("http://127.0.0.1:8001/submit"),
     mailbox=True
 )
 chat_proto = Protocol(spec=chat_protocol_spec)

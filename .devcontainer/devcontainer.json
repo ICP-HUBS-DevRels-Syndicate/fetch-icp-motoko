@@ -1,10 +1,14 @@
 {
   "name": "Fetch IC Dev Environment",
   "image": "ghcr.io/dfinity/icp-dev-env:latest",
-  "forwardPorts": [4943],
+  "forwardPorts": [4943, 8001],
   "portsAttributes": {
     "4943": {
       "label": "dfx",
+      "onAutoForward": "ignore"
+    },
+    "8001": {
+      "label": "http",
       "onAutoForward": "ignore"
     }
   },
@@ -34,10 +38,10 @@
           {
             "file": "typescript.instructions.md"
           }
-        ],        
+        ],
         "settingsSync.ignoredExtensions": ["*"],
         "settingsSync.ignoredSettings": [
-          "github.copilot.chat.codeGeneration.instructions"          
+          "github.copilot.chat.codeGeneration.instructions"
         ]
       },
       "codespaces": {

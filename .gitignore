@@ -34,6 +34,9 @@ yarn-error.log*
 .npm
 .yarn-integrity
 
+# Agent keys
+private_keys.json
+
 # Build and dependency directories
 .dfx/
 .azle/
