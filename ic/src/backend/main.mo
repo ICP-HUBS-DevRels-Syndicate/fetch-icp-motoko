@@ -213,6 +213,17 @@ persistent actor {
     };
   };
 
+  // Constructs a standardized error response for serialization failures
+  private func makeSerializationErrorResponse() : HttpResponse {
+    {
+      status_code = 500;
+      headers = [("content-type", "application/json")];
+      body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
+      streaming_strategy = null;
+      upgrade = null;
+    };
+  };
+
   // Handles simple HTTP routes (GET/OPTIONS and fallback)
   private func handleRoute(method : Text, url : Text, _body : Blob) : HttpResponse {
     let normalizedUrl = Text.trimEnd(url, #text "/");
@@ -223,13 +234,7 @@ persistent actor {
           message = "Welcome to the Dummy Bitcoin Canister API";
         };
         let blob = to_candid (welcomeMsg);
-        let #ok(jsonText) = JSON.toText(blob, WelcomeResponseKeys, null) else return {
-          status_code = 500;
-          headers = [("content-type", "application/json")];
-          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
-          streaming_strategy = null;
-          upgrade = null;
-        };
+        let #ok(jsonText) = JSON.toText(blob, WelcomeResponseKeys, null) else return makeSerializationErrorResponse();
         makeJsonResponse(200, jsonText);
       };
       case ("OPTIONS", _) {
@@ -271,75 +276,39 @@ persistent actor {
         let address = extractAddress(body);
         let response = await get_balance(address);
         let blob = to_candid (response);
-        let #ok(jsonText) = JSON.toText(blob, BalanceResponseKeys, null) else return {
-          status_code = 500;
-          headers = [("content-type", "application/json")];
-          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
-          streaming_strategy = null;
-          upgrade = null;
-        };
+        let #ok(jsonText) = JSON.toText(blob, BalanceResponseKeys, null) else return makeSerializationErrorResponse();
         makeJsonResponse(200, jsonText);
       };
       case ("POST", "/get-utxos") {
         let address = extractAddress(body);
         let utxos = await get_utxos(address);
         let blob = to_candid (utxos);
-        let #ok(jsonText) = JSON.toText(blob, UtxoResponseKeys, null) else return {
-          status_code = 500;
-          headers = [("content-type", "application/json")];
-          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
-          streaming_strategy = null;
-          upgrade = null;
-        };
+        let #ok(jsonText) = JSON.toText(blob, UtxoResponseKeys, null) else return makeSerializationErrorResponse();
         makeJsonResponse(200, jsonText);
       };
       case ("POST", "/get-current-fee-percentiles") {
         let percentiles = await get_current_fee_percentiles();
         let blob = to_candid (percentiles);
-        let #ok(jsonText) = JSON.toText(blob, [], null) else return {
-          status_code = 500;
-          headers = [("content-type", "application/json")];
-          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
-          streaming_strategy = null;
-          upgrade = null;
-        };
+        let #ok(jsonText) = JSON.toText(blob, [], null) else return makeSerializationErrorResponse();
         makeJsonResponse(200, jsonText);
       };
       case ("POST", "/get-p2pkh-address") {
         let response = await get_p2pkh_address();
         let blob = to_candid (response);
-        let #ok(jsonText) = JSON.toText(blob, AddressResponseKeys, null) else return {
-          status_code = 500;
-          headers = [("content-type", "application/json")];
-          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
-          streaming_strategy = null;
-          upgrade = null;
-        };
+        let #ok(jsonText) = JSON.toText(blob, AddressResponseKeys, null) else return makeSerializationErrorResponse();
         makeJsonResponse(200, jsonText);
       };
       case ("POST", "/send") {
         let (destination, amount) = extractSendParams(body);
         let response = await send(destination, amount);
         let blob = to_candid (response);
-        let #ok(jsonText) = JSON.toText(blob, SendResponseKeys, null) else return {
-          status_code = 500;
-          headers = [("content-type", "application/json")];
-          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
-          streaming_strategy = null;
-          upgrade = null;
-        };
+        let #ok(jsonText) = JSON.toText(blob, SendResponseKeys, null) else return makeSerializationErrorResponse();
         makeJsonResponse(200, jsonText);
       };
       case ("POST", "/dummy-test") {
         let response = await dummy_test();
         let blob = to_candid (response);
-        let #ok(jsonText) = JSON.toText(blob, DummyTestResponseKeys, null) else return {
-          status_code = 500;
-          headers = [("content-type", "application/json")];
-          body = Text.encodeUtf8("{\"error\": \"Failed to serialize response\"}");
-          streaming_strategy = null;
-          upgrade = null;
-        };
+        let #ok(jsonText) = JSON.toText(blob, DummyTestResponseKeys, null) else return makeSerializationErrorResponse();
         makeJsonResponse(200, jsonText);
       };
       case ("OPTIONS", _) {

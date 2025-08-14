@@ -1,14 +1,14 @@
 {
-  "name": "fetch-icp-azle",
+  "name": "fetch-icp-motoko",
   "version": "1.0.0",
   "description": "",
-  "workspaces": [
-    "ic"
-  ],
   "scripts": {
-    "format": "npm run format"
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "prettier": "^3.6.2"
+  }
 }

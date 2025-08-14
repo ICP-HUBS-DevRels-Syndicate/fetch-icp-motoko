@@ -136,7 +136,6 @@ INFO: [test-ICP-agent]: Agent inspector available at https://agentverse.ai/inspe
 ![Mailbox done](./fetch/images/mailbox-done.png)
 
 4. Test the agent using the Chat interface with queries like:
-
    - Once connected, click on Agent Profile
      ![Agent Profile](./fetch/images/agent-profile.png)
 
