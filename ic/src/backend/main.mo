@@ -9,6 +9,7 @@ import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Time "mo:base/Time";
 import Debug "mo:base/Debug";
+import Result "mo:base/Result";
 import { JSON } "mo:serde";
 import Types "./Types";
 
@@ -128,16 +129,16 @@ persistent actor {
   };
 
   // Extracts address from HTTP request body
-  private func extractAddress(body : Blob) : Text {
+  private func extractAddress(body : Blob) : Result.Result<Text, Text> {
     // Convert Blob to Text
     let jsonText = switch (Text.decodeUtf8(body)) {
-      case null { Debug.trap "unexpected format" };
+      case null { return #err("Invalid UTF-8 encoding in request body") };
       case (?txt) { txt };
     };
 
     // Parse JSON using serde
     let #ok(blob) = JSON.fromText(jsonText, null) else {
-      return "missing-address";
+      return #err("Invalid JSON format in request body");
     };
 
     // Extract address field from JSON
@@ -147,8 +148,8 @@ persistent actor {
     let addressField : ?Address = from_candid (blob);
 
     switch (addressField) {
-      case null return "missing-address-field";
-      case (?addr) addr.address;
+      case null return #err("Address field not found in JSON");
+      case (?addr) #ok(addr.address);
     };
   };
 
@@ -224,15 +225,12 @@ persistent actor {
     switch (method, normalizedUrl) {
       case ("POST", "/get-balance") {
         Debug.print("[INFO]: Started Get Balance");
-        let address = extractAddress(body);
-        switch (address) {
-          case "missing-address" {
-            return makeJsonResponse(400, "{\"error\": \"Missing address\"}");
+        let addressResult = extractAddress(body);
+        let address = switch (addressResult) {
+          case (#err(errorMessage)) {
+            return makeJsonResponse(400, "{\"error\": \"" # errorMessage # "\"}");
           };
-          case "missing-address-field" {
-            return makeJsonResponse(400, "{\"error\": \"Address field not found\"}");
-          };
-          case _ { /* valid address */ };
+          case (#ok(addr)) { addr };
         };
 
         let response : Types.BalanceResponse = await get_balance(address);
@@ -242,11 +240,18 @@ persistent actor {
         makeJsonResponse(200, jsonText);
       };
       case ("POST", "/get-utxos") {
-        let address = extractAddress(body);
-        let utxos = await get_utxos(address);
-        let blob = to_candid (utxos);
-        let #ok(jsonText) = JSON.toText(blob, UtxoResponseKeys, null) else return makeSerializationErrorResponse();
-        makeJsonResponse(200, jsonText);
+        let addressResult = extractAddress(body);
+        switch (addressResult) {
+          case (#err(errorMessage)) {
+            return makeJsonResponse(400, "{\"error\": \"" # errorMessage # "\"}");
+          };
+          case (#ok(address)) {
+            let utxos = await get_utxos(address);
+            let blob = to_candid (utxos);
+            let #ok(jsonText) = JSON.toText(blob, UtxoResponseKeys, null) else return makeSerializationErrorResponse();
+            makeJsonResponse(200, jsonText);
+          };
+        };
       };
       case ("POST", "/get-current-fee-percentiles") {
         let percentiles = await get_current_fee_percentiles();
