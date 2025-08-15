@@ -81,30 +81,7 @@ tools = [
             },
             "strict": True
         }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "send",
-            "description": "Sends satoshis from this canister to a specified address.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "destinationAddress": {
-                        "type": "string",
-                        "description": "The destination Bitcoin address."
-                    },
-                    "amountInSatoshi": {
-                        "type": "number",
-                        "description": "Amount to send in satoshis."
-                    }
-                },
-                "required": ["destinationAddress", "amountInSatoshi"],
-                "additionalProperties": False
-            },
-            "strict": True
-        }
-    }
+    },    
 ]
 
 async def call_icp_endpoint(func_name: str, args: dict):
@@ -116,10 +93,7 @@ async def call_icp_endpoint(func_name: str, args: dict):
         response = requests.post(url, headers=HEADERS, json={"address": args["address"]})
     elif func_name == "get_utxos":
         url = f"{BASE_URL}/get-utxos"
-        response = requests.post(url, headers=HEADERS, json={"address": args["address"]})
-    elif func_name == "send":
-        url = f"{BASE_URL}/send"
-        response = requests.post(url, headers=HEADERS, json=args)
+        response = requests.post(url, headers=HEADERS, json={"address": args["address"]})    
     else:
         raise ValueError(f"Unsupported function call: {func_name}")
     response.raise_for_status()
@@ -256,18 +230,18 @@ if __name__ == "__main__":
 
 """
 Queries for /get-balance
-What's the balance of address tb1qexample1234567890?
+What's the balance of address bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?
 
-Can you check how many bitcoins are in tb1qabcde000001234567?
+Can you check how many bitcoins are in bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?
 
-Show me the balance of this Bitcoin wallet: tb1qtestwalletxyz.
+Show me the balance of this Bitcoin wallet: bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs.
 
 🧾 Queries for /get-utxos
-What UTXOs are available for address tb1qexampleutxo0001?
+What UTXOs are available for address bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?
 
-List unspent outputs for tb1qunspentoutputs111.
+List unspent outputs for bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs.
 
-Do I have any unspent transactions for tb1qutxotest9999?
+Do I have any unspent transactions for bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?
 
 🧾 Queries for /get-current-fee-percentiles
 What are the current Bitcoin fee percentiles?
@@ -282,18 +256,4 @@ What is my canister's P2PKH address?
 Generate a Bitcoin address for me.
 
 Give me a Bitcoin address I can use to receive coins.
-
-🧾 Queries for /send
-Send 10,000 satoshis to tb1qreceiver000111.
-
-Transfer 50000 sats to tb1qsimplewalletabc.
-
-I want to send 120000 satoshis to tb1qdonationaddress001.
-
-🧾 General/Dummy Test
-Run the dummy test endpoint.
-
-Can I see a test response?
-
-Hit the dummy-test route to make sure it works.
 """

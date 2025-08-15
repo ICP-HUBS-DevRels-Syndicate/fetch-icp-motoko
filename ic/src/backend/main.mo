@@ -1,13 +1,11 @@
 import Text "mo:base/Text";
 import Blob "mo:base/Blob";
-import Int "mo:base/Int";
 import Int64 "mo:base/Int64";
 import Nat "mo:base/Nat";
 import Nat16 "mo:base/Nat16";
 import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
-import Time "mo:base/Time";
 import Debug "mo:base/Debug";
 import Result "mo:base/Result";
 import { JSON } "mo:serde";
@@ -19,8 +17,6 @@ persistent actor {
   let BalanceResponseKeys = ["address", "balance", "unit"];
   let UtxoResponseKeys = ["txid", "vout", "value", "confirmations"];
   let AddressResponseKeys = ["address"];
-  let SendResponseKeys = ["success", "destination", "amount", "txId"];
-  let DummyTestResponseKeys = ["status", "data", "message", "timestamp", "testData", "id", "name", "value", "isTest"];
 
   // Reference to the management canister
   let management_canister = actor ("aaaaa-aa") : actor {
@@ -91,42 +87,7 @@ persistent actor {
     };
   };
 
-  // Dummy: Sends satoshis from this canister to a specified address
-  public shared func send(destinationAddress : Text, amountInSatoshi : Nat) : async Types.SendResponse {
-    {
-      success = true;
-      destination = destinationAddress;
-      amount = amountInSatoshi;
-      txId = "dummy-txid-sent-1234567890";
-    };
-  };
-
-  // Dummy test endpoint
-  public shared query func dummy_test() : async Types.DummyTestResponse {
-    let now = Time.now();
-    let timestamp = "2024-" # Int.toText(now / 1000000000) # "T00:00:00.000Z";
-
-    {
-      status = "success";
-      data = {
-        message = "This is a dummy response";
-        timestamp = timestamp;
-        testData = {
-          id = 1;
-          name = "Test Bitcoin Data";
-          value = 0.001;
-          isTest = true;
-        };
-      };
-    };
-  };
-
   // ----- Private helper functions -----
-
-  // Extracts send parameters from HTTP request body (simplified demo)
-  private func extractSendParams(_body : Blob) : (Text, Nat) {
-    ("extracted-destination", 50000);
-  };
 
   // Extracts address from HTTP request body
   private func extractAddress(body : Blob) : Result.Result<Text, Text> {
@@ -197,7 +158,7 @@ persistent actor {
           upgrade = null;
         };
       };
-      case ("POST", "/get-balance" or "/get-utxos" or "/get-current-fee-percentiles" or "/get-p2pkh-address" or "/send" or "/dummy-test") {
+      case ("POST", "/get-balance" or "/get-utxos" or "/get-current-fee-percentiles" or "/get-p2pkh-address") {
         {
           status_code = 200;
           headers = [("content-type", "application/json")];
@@ -263,19 +224,6 @@ persistent actor {
         let response = await get_p2pkh_address();
         let blob = to_candid (response);
         let #ok(jsonText) = JSON.toText(blob, AddressResponseKeys, null) else return makeSerializationErrorResponse();
-        makeJsonResponse(200, jsonText);
-      };
-      case ("POST", "/send") {
-        let (destination, amount) = extractSendParams(body);
-        let response = await send(destination, amount);
-        let blob = to_candid (response);
-        let #ok(jsonText) = JSON.toText(blob, SendResponseKeys, null) else return makeSerializationErrorResponse();
-        makeJsonResponse(200, jsonText);
-      };
-      case ("POST", "/dummy-test") {
-        let response = await dummy_test();
-        let blob = to_candid (response);
-        let #ok(jsonText) = JSON.toText(blob, DummyTestResponseKeys, null) else return makeSerializationErrorResponse();
         makeJsonResponse(200, jsonText);
       };
       case ("OPTIONS", _) {

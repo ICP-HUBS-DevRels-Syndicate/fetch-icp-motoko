@@ -15,6 +15,25 @@ fetch-icp-integration/
             └── index.ts     # Dummy Bitcoin HTTP server
 ```
 
+## Template and Codespace for Development
+
+This project is set up as a **GitHub template** repository for easy development using **GitHub Codespaces**. To get started:
+
+1. **Create your own repository**: Click the green **"Use this template"** button at the top of this repository page. This will create a new repository under your GitHub profile or organization with all the project files.
+
+2. **Launch Codespace**: Once your repository is created, click the green **"Code"** dropdown button and select the **"Codespaces"** tab. Then click **"Create codespace on main"** to start a new development environment.
+
+3. **Wait for setup**: The Codespace will automatically build and configure the development environment. This may take a few minutes as it installs all necessary dependencies and tools.
+
+### Development Environment Configuration
+
+The development environment is configured through two key files:
+
+- **`.devcontainer/devcontainer.json`**: Defines the Codespace configuration including the base image, extensions, and port forwarding settings
+- **`scripts/devcontainer-setup.sh`**: Contains the setup script that installs dependencies like DFX (DFINITY SDK), Node.js packages, and Python requirements
+
+You can examine these files to understand how the environment is configured or to customize it for your specific needs.
+
 ## ICP Component
 
 The ICP component (`ic/src/backend/index.ts`) implements a dummy HTTP server with the following endpoints:
@@ -23,8 +42,6 @@ The ICP component (`ic/src/backend/index.ts`) implements a dummy HTTP server wit
 - `/get-utxos` - Returns dummy UTXOs for a Bitcoin address
 - `/get-current-fee-percentiles` - Returns dummy fee percentiles
 - `/get-p2pkh-address` - Returns a dummy P2PKH address
-- `/send` - Simulates sending Bitcoin to an address
-- `/dummy-test` - Test endpoint for basic connectivity
 
 Note: This is a dummy implementation that returns mock data. The actual implementation needs to be amended.
 
