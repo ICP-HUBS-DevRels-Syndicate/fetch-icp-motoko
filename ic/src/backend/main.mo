@@ -8,6 +8,7 @@ import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Time "mo:base/Time";
+import Debug "mo:base/Debug";
 import { JSON } "mo:serde";
 import Types "./Types";
 
@@ -128,15 +129,26 @@ persistent actor {
 
   // Extracts address from HTTP request body
   private func extractAddress(body : Blob) : Text {
-    // Parse JSON and extract address field
-    type AddressBody = {
-      address : Text;
+    // Convert Blob to Text
+    let jsonText = switch (Text.decodeUtf8(body)) {
+      case null { Debug.trap "unexpected format" };
+      case (?txt) { txt };
     };
 
-    let addressBody : ?AddressBody = from_candid (body);
-    switch (addressBody) {
-      case null "missing-address"; // Return fallback
-      case (?b) { b.address };
+    // Parse JSON using serde
+    let #ok(blob) = JSON.fromText(jsonText, null) else {
+      return "missing-address";
+    };
+
+    // Extract address field from JSON
+    type Address = {
+      address : Text;
+    };
+    let addressField : ?Address = from_candid (blob);
+
+    switch (addressField) {
+      case null return "missing-address-field";
+      case (?addr) addr.address;
     };
   };
 
@@ -211,10 +223,22 @@ persistent actor {
 
     switch (method, normalizedUrl) {
       case ("POST", "/get-balance") {
+        Debug.print("[INFO]: Started Get Balance");
         let address = extractAddress(body);
-        let response = await get_balance(address);
+        switch (address) {
+          case "missing-address" {
+            return makeJsonResponse(400, "{\"error\": \"Missing address\"}");
+          };
+          case "missing-address-field" {
+            return makeJsonResponse(400, "{\"error\": \"Address field not found\"}");
+          };
+          case _ { /* valid address */ };
+        };
+
+        let response : Types.BalanceResponse = await get_balance(address);
         let blob = to_candid (response);
         let #ok(jsonText) = JSON.toText(blob, BalanceResponseKeys, null) else return makeSerializationErrorResponse();
+        Debug.print("[INFO]: Get Balance response: " # debug_show (jsonText));
         makeJsonResponse(200, jsonText);
       };
       case ("POST", "/get-utxos") {

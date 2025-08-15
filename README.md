@@ -30,8 +30,8 @@ Note: This is a dummy implementation that returns mock data. The actual implemen
 
 You can call from the command line:
 
-- curl http://[canisterId].localhost:4943/
-- curl -X POST -H "Content-Type: application/json" -d "{ \"address\": \"[BTC Address]\" }" http://[canisterId].localhost:4943/get-balance
+- curl http://[canisterId].raw.localhost:4943/
+- curl -X POST -H "Content-Type: application/json" -d "{ \"address\": \"[BTC Address]\" }" http://[canisterId].raw.localhost:4943/get-balance
 
 ---
 
