@@ -184,3 +184,77 @@ The agent supports various types of queries:
 
 - What are the current Bitcoin fee percentiles?
 - Show me the latest fee percentile distribution
+
+## 🚀 Deploying and Optimizing Your Agent
+
+### Publishing to Agentverse
+
+Once your agent is running successfully, you'll want to make it discoverable on the Agentverse platform. This increases its visibility and allows other users to interact with your Bitcoin service agent.
+
+#### Step 1: Access Agentverse
+
+1. Navigate to [https://agentverse.ai/agents](https://agentverse.ai/agents)
+2. Locate your agent in the agent list (it should appear automatically if running with mailbox connection)
+
+#### Step 2: Enhance Your Agent Profile
+
+To maximize discoverability, update the following elements:
+
+- **Agent Name**: Choose a descriptive name that clearly indicates its Bitcoin functionality
+- **Description**: Write a compelling summary of your agent's capabilities
+- **README**: Use the template provided below for a complete documentation
+- **Tags**: Add relevant tags like `bitcoin`, `crypto`, `balance`, `icp`, `defi`
+- **Avatar**: Upload a professional avatar or logo that represents your service
+
+### Example Agent README Template
+
+Here's a ready-to-use template for your agent's README on Agentverse. Simply copy and paste this entire section:
+
+```markdown
+# Bitcoin Testnet Balance Agent
+
+![tag:innovationlab](https://img.shields.io/badge/innovationlab-3D8BD3)
+![tag:internetcomputer](https://img.shields.io/badge/internetcomputer-9370DB)
+![tag:bitcoin](https://img.shields.io/badge/bitcoin-FF6C49)
+![tag:chatprotocol](https://img.shields.io/badge/chatprotocol-3D8BD3)
+
+An AI-powered agent that can check the wallet balances for a given address on Bitcoin(BTC) testnet using natural language queries. It is built using the uAgents framework and integrated with Internet Computer for secure Bitcoin operations. It also provides dummy responses for other Bitcoin blockchain services through natural language queries
+
+## Features
+
+- **Balance Checking**: Query Bitcoin address balances in real-time (BTC Testnet)
+- **UTXO Analysis**: Get detailed unspent transaction outputs for any address (Dummy Response)
+- **Fee Monitoring**: Access current Bitcoin network fee percentiles (Dummy Response)
+- **Natural Language**: Understands conversational Bitcoin queries
+- **ICP Integration**: Secure operations through Internet Computer Protocol
+- **Real-time Data**: Live blockchain data and network information
+
+## Usage Examples
+
+### Balance Queries (BTC Testnet)
+
+- "What's the balance of address bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?"
+- "Can you check how many bitcoins are in bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?"
+- "Show me the balance of this Bitcoin wallet: bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs"
+
+### UTXO Queries
+
+- "What UTXOs are available for address bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?"
+- "List unspent outputs for bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs"
+- "Do I have any unspent transactions for bc1q8sxznvhualuyyes0ded7kgt33876phpjhp29rs?"
+
+### Fee Queries
+
+- "What are the current Bitcoin fee percentiles?"
+- "Show me the latest fee percentile distribution"
+- "How much are the Bitcoin network fees right now?"
+
+## Technical Details
+
+- **Framework**: uAgents
+- **LLM Integration**: ASI1 AI
+- **Blockchain**: Bitcoin
+- **Protocol**: Internet Computer Protocol (ICP)
+
+**Powered by Fetch.ai and Internet Computer | Built for Agentverse**
+```
