@@ -45,7 +45,7 @@ python3 -m venv venv
 # Activate virtual environment and install uagents
 echo "Installing uagents..."
 source venv/bin/activate
-pip install uagents==0.22.5
+pip install uagents>=0.22.7
 cd ..
 
 echo "✅ Devcontainer setup complete!"
